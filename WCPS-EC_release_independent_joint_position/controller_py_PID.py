@@ -6,6 +6,7 @@ import time
 import serial
 import math
 import numpy
+import re
 from datetime import datetime
 from threading import Thread
 from SocketServer import ThreadingMixIn
@@ -35,7 +36,7 @@ while True:
     print >>sys.stderr,'Connection from:', client_address
     try:
       while True:
-            data=connection.recv(64) 
+            data=connection.recv(80) 
             #print data     
             if data:
                   t = time.time()
@@ -43,7 +44,8 @@ while True:
                   print round_counter
                   timeT=datetime.now().strftime('%Y,%m,%d,%H,%M,%S.%f')
                   print "data=",data
-                  data_split = [float(x) for x in data.split(',')]
+                  #data_split = [float(x) for x in data.split(',')]
+                  data_split = [float(x.strip()) for x in re.compile('-*\w+.\w+').findall(data.strip())]
 
                   #print data
                   if data_split[0] !=10000:
@@ -68,11 +70,11 @@ while True:
                     # print "ki*delta_t*theta_error:", ki*delta_t*theta_error
                     # print "kd*(theta_error-2 * theta_last + theta_last_last)/delta_t:", kd*(theta_error-2 * theta_last + theta_last_last)/delta_t
                     if round_counter == 1:
-                      theta_last_last = theta
-                      theta_last = theta
+                      theta_last_last = theta_error
+                      theta_last = theta_error
                       uout_last = uini
                       # uout = uini
-                      uout = uout_last + kp*(theta_error - theta_last) + ki*delta_t*theta_error + kd*(theta_error-2 * theta_last + theta_last_last)/delta_t
+                      uout = uout_last + kp*theta_error + ki*delta_t*theta_error
                     
                     else:
                       uout = uout_last + kp*(theta_error - theta_last) + ki*delta_t*theta_error + kd*(theta_error-2 * theta_last + theta_last_last)/delta_t

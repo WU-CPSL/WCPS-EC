@@ -54,6 +54,8 @@ t_l_write_x = [];
 uuu = [];
 
 %% RUN Wireless  Process Control Simulation
+yh = 1;
+time_delayp = time_delay;
 q0 = q0_m(yh);
 qf = 8;
 
